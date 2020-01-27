@@ -5,9 +5,10 @@ import { StyleSheet, Text, View } from 'react-native';
 const lottoCount = 6; //로또 한번에 선택할수 있는 개수
 const lottoMaxnumber = 45; //로또 번호 선택할수 있는 최댓값
 
-let bonusBall = 0;
+//let bonusBall = 0;
 
 const selectedNumber = [38, 39, 31, 16, 41, 26];
+const selectedbonusBall = 23;
 //const selectedNumber = [1, 2, 3, 4, 5, 6]  //로또번호 선택
 
 let ratio = [0,0,0,0,0,0];
@@ -38,14 +39,14 @@ export default class App extends React.Component{
   checkLotto = (array, seletedArray) => {
     // 로또 추첨
     let hitCount = 0;
-    let isFinished = true;
+    //let isFinished = true;
 
-    while (isFinished) {
-      bonusBall = Math.floor(Math.random() * lottoMaxnumber + 1);
-      if ( selectedNumber.indexOf(bonusBall) === -1 ){
-        isFinished = false;
-      }
-    }
+    // while (isFinished) {
+    //   bonusBall = Math.floor(Math.random() * lottoMaxnumber + 1);
+    //   if ( selectedNumber.indexOf(bonusBall) === -1 ){
+    //     isFinished = false;
+    //   }
+    // }
     
     array.map((each) => {
       if (seletedArray.indexOf(each) !== -1) {
@@ -64,7 +65,7 @@ export default class App extends React.Component{
       //console.log("1등");
       ratio[0]++;
     } else if (hitCount === 5) {
-        if (array.indexOf(bonusBall) !== -1) {
+        if (array.indexOf(selectedbonusBall) !== -1) {
           //console.log("2등");
           ratio[1]++;
         } else {
@@ -105,20 +106,22 @@ export default class App extends React.Component{
   }
 
   componentDidMount() {
-    setInterval(this.numberUp, 1);
+    setInterval(this.numberUp, 0); // 0으로 설정하면 가장 빠르게해줌^^
+
+    
 
   }
 
   render() {
     return (
       <View style={styles.container}>
-        <Text>시도 : {this.state.count} 금액: </Text>
-        <Text>1등 : {ratio[0]}</Text>
-        <Text>2등 : {ratio[1]}</Text>
-        <Text>3등 : {ratio[2]}</Text>
-        <Text>4등 : {ratio[3]}</Text>
-        <Text>5등 : {ratio[4]}</Text>
-        <Text>꽝  : {ratio[5]}</Text>
+        <Text style={styles.text}>시도 : {this.state.count} 금액: </Text>
+        <Text style={styles.text}>1등 : {ratio[0]}</Text>
+        <Text style={styles.text}>2등 : {ratio[1]}</Text>
+        <Text style={styles.text}>3등 : {ratio[2]}</Text>
+        <Text style={styles.text}>4등 : {ratio[3]}</Text>
+        <Text style={styles.text}>5등 : {ratio[4]}</Text>
+        <Text style={styles.text}>꽝  : {ratio[5]}</Text>
 
       </View>
     );
@@ -132,4 +135,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  text: {
+    fontSize: 25
+  }
 });
