@@ -5,123 +5,86 @@ import { StyleSheet, Text, View } from 'react-native';
 const lottoCount = 6; //로또 한번에 선택할수 있는 개수
 const lottoMaxnumber = 45; //로또 번호 선택할수 있는 최댓값
 
-//let bonusBall = 0;
+const winningNumbers = [38, 39, 31, 16, 41, 26]; //당첨번호
+const winningBonusNumber = 23; //당첨 보너스번호
 
-const selectedNumber = [38, 39, 31, 16, 41, 26];
-const selectedbonusBall = 23;
-//const selectedNumber = [1, 2, 3, 4, 5, 6]  //로또번호 선택
-
-let ratio = [0,0,0,0,0,0];
-
+let winningCount = [0,0,0,0,0,0]; //당첨자 1~5등, 꽝, 횟수 카운트
 
 export default class App extends React.Component{
   state = {
     count: 0
   }
 
-
-  generateAutoLotto = (count, maxNumber) => {
-    //로또번호 생성기
-    let randomBall = [];
+  generateAutoLotto = () => {
+    //자동 로또번호 생성기
+    let autoLottoNumbers = [];
     
-    while (randomBall.length < count) {
-      let randomNumber = Math.floor(Math.random() * maxNumber + 1)
-      if ( randomBall.indexOf(randomNumber) === -1 ){
-        randomBall.push(randomNumber);
+    while (autoLottoNumbers.length < lottoCount) {
+      let randomNumber = Math.floor(Math.random() * lottoMaxnumber + 1);
+      if ( autoLottoNumbers.indexOf(randomNumber) === -1 ){
+        autoLottoNumbers.push(randomNumber);
       }
     }
-
-    //console.log(randomBall);
-    return randomBall;
+    return autoLottoNumbers;
   }
 
-
-  checkLotto = (array, seletedArray) => {
-    // 로또 추첨
+  checkLottoHitCount = (autoLottoNumbers) => {
+    // 로또 맞은 개수 확인
     let hitCount = 0;
-    //let isFinished = true;
-
-    // while (isFinished) {
-    //   bonusBall = Math.floor(Math.random() * lottoMaxnumber + 1);
-    //   if ( selectedNumber.indexOf(bonusBall) === -1 ){
-    //     isFinished = false;
-    //   }
-    // }
     
-    array.map((each) => {
-      if (seletedArray.indexOf(each) !== -1) {
+    autoLottoNumbers.map((eachNumber) => {
+      if (winningNumbers.indexOf(eachNumber) !== -1) {
         hitCount++;
       }
     })
-
-    //console.log(hitCount);
-    //console.log("보너스볼 : ", bonusBall);
     return hitCount;
   }
 
-
-  givePrize = (hitCount, array) => {
+  givePrize = (hitCount, autoLottoNumbers) => {
+    // 로또 등수 판별 후 카운팅
     if (hitCount === 6) {
-      //console.log("1등");
-      ratio[0]++;
+      winningCount[0]++;
     } else if (hitCount === 5) {
-        if (array.indexOf(selectedbonusBall) !== -1) {
-          //console.log("2등");
-          ratio[1]++;
-        } else {
-          //console.log("3등");
-          ratio[2]++;
-        }
-      } else if (hitCount === 4) {
-        //console.log("4등");
-        ratio[3]++;
-      } else if (hitCount === 3) {
-        //console.log("5등");
-        ratio[4]++;
+      if (autoLottoNumbers.indexOf(winningBonusNumber) !== -1) {
+        winningCount[1]++;
       } else {
-        //console.log("꽝");
-        ratio[5]++;
+        winningCount[2]++;
       }
+    } else if (hitCount === 4) {
+      winningCount[3]++;
+    } else if (hitCount === 3) {
+      winningCount[4]++;
+    } else {
+      winningCount[5]++;
     }
+  }
 
+  lotterySimulator = () => {
+    const autoLottoArray = this.generateAutoLotto();
+    const hitCount = this.checkLottoHitCount(autoLottoArray);
+    this.givePrize(hitCount, autoLottoArray);
 
-
-
-  numberUp = () => {
-
-
-
-    const lottoArray = this.generateAutoLotto(lottoCount, lottoMaxnumber);
-    
-    const hitCount = this.checkLotto(lottoArray,selectedNumber);
-    
-    this.givePrize(hitCount, lottoArray);
-
-
-
-      this.setState((prevState) => ({
-        count: prevState.count + 1
-      }));
-
+    this.setState((prevState) => ({
+      count: prevState.count + 1
+    }));
   }
 
   componentDidMount() {
-    setInterval(this.numberUp, 0); // 0으로 설정하면 가장 빠르게해줌^^
-
-    
-
+    setInterval(this.lotterySimulator, 0); // 0으로 설정하면 가장 빠르게해줌^^
   }
 
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.text}>시도 : {this.state.count} 금액: </Text>
-        <Text style={styles.text}>1등 : {ratio[0]}</Text>
-        <Text style={styles.text}>2등 : {ratio[1]}</Text>
-        <Text style={styles.text}>3등 : {ratio[2]}</Text>
-        <Text style={styles.text}>4등 : {ratio[3]}</Text>
-        <Text style={styles.text}>5등 : {ratio[4]}</Text>
-        <Text style={styles.text}>꽝  : {ratio[5]}</Text>
+        <Text style={styles.text}>시도 : {this.state.count} 금액: {this.state.count * 1000} 원</Text>
+        <Text style={styles.text}>1등 : {winningCount[0]} 번, 확률 : {(winningCount[0] / this.state.count).toFixed(3)} %</Text>
+        <Text style={styles.text}>2등 : {winningCount[1]} 번, 확률 : {(winningCount[1] / this.state.count).toFixed(3)} %</Text>
+        <Text style={styles.text}>3등 : {winningCount[2]} 번, 확률 : {(winningCount[2] / this.state.count).toFixed(3)} %</Text>
+        <Text style={styles.text}>4등 : {winningCount[3]} 번, 확률 : {(winningCount[3] / this.state.count).toFixed(3)} %</Text>
+        <Text style={styles.text}>5등 : {winningCount[4]} 번, 확률 : {(winningCount[4] / this.state.count).toFixed(3)} %</Text>
+        <Text style={styles.text}>꽝  : {winningCount[5]} 번, 확률 : {(winningCount[5] / this.state.count).toFixed(3)} %</Text>
+
+        <Text style={styles.text}>수익 : {(1928079219 * winningCount[0])+(66485491 * winningCount[1])+(1402240 * winningCount[2])+(50000 * winningCount[3])+(5000 * winningCount[4]) - (this.state.count * 1000)} 원</Text>
 
       </View>
     );
@@ -136,6 +99,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   text: {
-    fontSize: 25
+    fontSize: 20
   }
 });
